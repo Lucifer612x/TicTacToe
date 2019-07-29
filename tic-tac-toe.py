@@ -1,294 +1,326 @@
 # Крестики-нолики ( текстовые )
 import random
 
-class TicTacToe():
-	print("Крестики-нолики!")
-
-	def mode_selection(self):
-		answer = input("В какой режим хотите играть ai/pl? ")
-
-		if answer == "ai":
-			TicTacToe.vsAI().game()
 
-		elif answer == "pl":
-			TicTacToe.vsPlayer().game()
+class TicTacToe:
+    print("Крестики-нолики!")
+
+    def mode_selection(self):
+        answer = input("В какой режим хотите играть ai/pl? ")
+
+        if answer == "ai":
+            TicTacToe.vsAI().game()
+
+        elif answer == "pl":
+            TicTacToe.vsPlayer().game()
+
+    # Игра против исскуственнго интеллекта
+    class vsAI:
+        def __init__(self, *kwargs):
+            self.places = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            self.cell = None
+            self.rnd_token = random.randint(1, 2)
+
+        def board_generation(self):
+            print("")
+            print(" -------------")
+
+            for i in range(3):
+                print(
+                    " |",
+                    self.places[0 + i * 3],
+                    "|",
+                    self.places[1 + i * 3],
+                    "|",
+                    self.places[2 + i * 3],
+                    "|",
+                )
+                print(" -------------")
+
+        def player_turn(self):
+            print("")
+            print("Ход игрока!")
+
+            waiting = True
+            if self.rnd_token == 1:
+                token = "X"
+            else:
+                token = "O"
+
+            while waiting:
+                self.cell = input("Куда хотите поставить " + token + " ? ")
+
+                try:
+                    self.cell = int(self.cell)
+
+                except:
+                    print("Вы должны ввести число.")
+                    continue
 
-	# Игра против исскуственнго интеллекта
-	class vsAI():
-		def __init__(self, *kwargs):
-				self.places = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
-				self.cell = None
-				self.rnd_token = random.randint(1, 2)
+                if self.cell == 101:
+                    print("Секретный код 101, игра заканчивается!")
+                    break
+
+                if self.cell >= 1 and self.cell <= 9:
+                    if str(self.places[self.cell - 1]) not in "XO":
+                        self.places[self.cell - 1] = token
+                        waiting = False
+                    else:
+                        print("Эта клеточка уже занята.")
+
+                else:
+                    print("Число должно быть от 1 до 9.")
+
+        def AI_turn(self):
+            print("")
+            print("Ход бота!")
+
+            running = True
+            if self.rnd_token == 1:
+                token = "O"
+            else:
+                token = "X"
+
+            while running:
+
+                rnd = random.choice(range(0, 9))
+
+                if str(self.places[rnd]) not in "XO":
+                    print("Бот ставит", self.places[rnd])
+                    self.places[rnd] = token
+                    running = False
+
+        def check_win(self):
+            self.win_combo = (
+                (0, 1, 2),
+                (3, 4, 5),
+                (6, 7, 8),
+                (0, 3, 6),
+                (1, 4, 7),
+                (2, 5, 8),
+                (0, 4, 8),
+                (2, 4, 6),
+            )
+
+            for each in self.win_combo:
+                if self.places[each[0]] == self.places[each[1]] == self.places[each[2]]:
+                    return self.places[each[0]]
 
-		def board_generation(self):
-			print("")
-			print(' -------------')
+            return False
 
-			for i in range(3):
-				print(' |', self.places[ 0 + i * 3 ], '|', self.places[ 1 + i * 3 ], '|', self.places[ 2 + i * 3 ], '|')
-				print(' -------------')
+        def game(self):
+            turn = 0
+            win = False
 
-		def player_turn(self):
-			print("")
-			print('Ход игрока!')
+            while not win:
 
-			waiting = True
-			if self.rnd_token == 1:
-				token = "X"
-			else:
-				token = "O"
+                self.board_generation()
 
-			while waiting:
-				self.cell = input('Куда хотите поставить ' + token + ' ? ')
+                if self.rnd_token == 1:
+                    if turn % 2 == 0:
+                        self.player_turn()
 
-				try:
-					self.cell = int(self.cell) 
+                        if self.cell == 101:
+                            break
 
-				except:
-					print("Вы должны ввести число.")
-					continue
+                    else:
+                        self.AI_turn()
 
-				if self.cell == 101:
-					print("Секретный код 101, игра заканчивается!")
-					break
+                else:
+                    if turn % 2 == 0:
+                        self.AI_turn()
 
-				if self.cell >= 1 and self.cell <= 9:
-					if str( self.places[ self.cell - 1 ] ) not in "XO":
-						self.places[ self.cell - 1 ] = token
-						waiting = False
-					else:
-						print("Эта клеточка уже занята.")
+                    else:
+                        self.player_turn()
 
-				else:
-					print("Число должно быть от 1 до 9.")
+                        if self.cell == 101:
+                            break
 
-		def AI_turn(self):
-			print("")
-			print("Ход бота!")
+                turn += 1
 
-			running = True
-			if self.rnd_token == 1:
-				token = "O"
-			else:
-				token = "X"
+                if turn > 4:
+                    winner = self.check_win()
+                    if winner != False:
+                        print("Выйграл", winner, "!")
+                        win = True
+                        break
 
-			while running:
-				
-				rnd = random.choice(range(0, 9))
+                if turn == 9:
+                    print("Ничья!")
+                    break
 
-				if str( self.places[ rnd ] ) not in "XO":
-					print("Бот ставит", self.places[ rnd ])
-					self.places[ rnd ] = token
-					running = False
+            self.board_generation()
 
-		def check_win(self):
-			self.win_combo = ((0, 1, 2), (3, 4, 5), (6, 7, 8), 
-							  (0, 3, 6), (1, 4, 7), (2, 5, 8),
-							  (0, 4, 8), (2, 4, 6))	
+            contin = input("Хотите продолжить yes/no? ")
 
-			for each in self.win_combo:
-				if self.places[each[0]] == self.places[each[1]] == self.places[each[2]]:
-					return self.places[each[0]]
+            if contin == "yes":
+                TicTacToe.vsAI().game()
 
-			return False
+    # Игра против человека
+    class vsPlayer:
+        def __init__(self, *kwargs):
+            self.places = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            self.cell = None
+            self.rnd_token = random.randint(1, 2)
+
+        def board_generation(self):
+            print("")
+            print(" -------------")
+
+            for i in range(3):
+                print(
+                    " |",
+                    self.places[0 + i * 3],
+                    "|",
+                    self.places[1 + i * 3],
+                    "|",
+                    self.places[2 + i * 3],
+                    "|",
+                )
+                print(" -------------")
 
-		def game(self):
-			turn = 0
-			win = False
+        def first_player_turn(self):
+            print("")
 
-			while not win:
+            waiting = True
+            if self.rnd_token == 1:
+                token = "X"
+            else:
+                token = "O"
 
-				self.board_generation()
+            print("Ход", token, "игрока!")
 
-				if self.rnd_token == 1:
-					if turn % 2 == 0:
-						self.player_turn()
+            while waiting:
+                self.cell = input("Куда хотите поставить " + token + " ? ")
 
-						if self.cell == 101:
-							break
+                try:
+                    self.cell = int(self.cell)
 
-					else:
-						self.AI_turn()
+                except:
+                    print("Вы должны ввести число.")
+                    continue
 
-				else:
-					if turn % 2 == 0:
-						self.AI_turn()
+                if self.cell == 101:
+                    print("Секретный код 101, игра заканчивается!")
+                    break
 
-					else:
-						self.player_turn()
+                if self.cell >= 1 and self.cell <= 9:
+                    if str(self.places[self.cell - 1]) not in "XO":
+                        self.places[self.cell - 1] = token
+                        waiting = False
+                    else:
+                        print("Эта клеточка уже занята.")
 
-						if self.cell == 101:
-							break
+                else:
+                    print("Число должно быть от 1 до 9.")
 
-				turn += 1
+        def second_player_turn(self):
+            print("")
 
-				if turn > 4:
-					winner = self.check_win()
-					if winner != False:
-						print("Выйграл", winner, "!")
-						win = True
-						break
+            waiting = True
+            if self.rnd_token == 1:
+                token = "O"
+            else:
+                token = "X"
 
-				if turn == 9:
-					print("Ничья!")
-					break
+            print("Ход", token, "игрока!")
 
-			self.board_generation()
+            while waiting:
+                self.cell = input("Куда хотите поставить " + token + " ? ")
 
-			contin = input("Хотите продолжить yes/no? ")
+                try:
+                    self.cell = int(self.cell)
 
-			if contin == "yes":
-				TicTacToe.vsAI().game()
+                except:
+                    print("Вы должны ввести число.")
+                    continue
 
-	# Игра против человека
-	class vsPlayer():
-		def __init__(self, *kwargs):
-				self.places = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
-				self.cell = None
-				self.rnd_token = random.randint(1, 2)
+                if self.cell == 101:
+                    print("Секретный код 101, игра заканчивается!")
+                    break
 
-		def board_generation(self):
-			print("")
-			print(' -------------')
+                if self.cell >= 1 and self.cell <= 9:
+                    if str(self.places[self.cell - 1]) not in "XO":
+                        self.places[self.cell - 1] = token
+                        waiting = False
+                    else:
+                        print("Эта клеточка уже занята.")
 
-			for i in range(3):
-				print(' |', self.places[ 0 + i * 3 ], '|', self.places[ 1 + i * 3 ], '|', self.places[ 2 + i * 3 ], '|')
-				print(' -------------')
+                else:
+                    print("Число должно быть от 1 до 9.")
 
-		def first_player_turn(self):
-			print("")
+        def check_win(self):
+            self.win_combo = (
+                (0, 1, 2),
+                (3, 4, 5),
+                (6, 7, 8),
+                (0, 3, 6),
+                (1, 4, 7),
+                (2, 5, 8),
+                (0, 4, 8),
+                (2, 4, 6),
+            )
 
-			waiting = True
-			if self.rnd_token == 1:
-				token = "X"
-			else:
-				token = "O"
+            for each in self.win_combo:
+                if self.places[each[0]] == self.places[each[1]] == self.places[each[2]]:
+                    return self.places[each[0]]
 
-			print('Ход', token, 'игрока!')
+            return False
 
-			while waiting:
-				self.cell = input('Куда хотите поставить ' + token + ' ? ')
+        def game(self):
+            turn = 0
+            win = False
 
-				try:
-					self.cell = int(self.cell) 
+            while not win:
 
-				except:
-					print("Вы должны ввести число.")
-					continue
+                self.board_generation()
 
-				if self.cell == 101:
-					print("Секретный код 101, игра заканчивается!")
-					break
+                if self.rnd_token == 1:
+                    if turn % 2 == 0:
+                        self.first_player_turn()
 
-				if self.cell >= 1 and self.cell <= 9:
-					if str( self.places[ self.cell - 1 ] ) not in "XO":
-						self.places[ self.cell - 1 ] = token
-						waiting = False
-					else:
-						print("Эта клеточка уже занята.")
+                        if self.cell == 101:
+                            break
 
-				else:
-					print("Число должно быть от 1 до 9.")
+                    else:
+                        self.second_player_turn()
 
-		def second_player_turn(self):
-			print("")
+                        if self.cell == 101:
+                            break
 
-			waiting = True
-			if self.rnd_token == 1:
-				token = "O"
-			else:
-				token = "X"
+                else:
+                    if turn % 2 == 0:
+                        self.second_player_turn()
 
-			print('Ход', token, 'игрока!')
+                        if self.cell == 101:
+                            break
 
-			while waiting:
-				self.cell = input('Куда хотите поставить ' + token + ' ? ')
+                    else:
+                        self.first_player_turn()
 
-				try:
-					self.cell = int(self.cell) 
+                        if self.cell == 101:
+                            break
 
-				except:
-					print("Вы должны ввести число.")
-					continue
+                turn += 1
 
-				if self.cell == 101:
-					print("Секретный код 101, игра заканчивается!")
-					break
+                if turn > 4:
+                    winner = self.check_win()
+                    if winner != False:
+                        print("Выйграл", winner, "!")
+                        win = True
+                        break
 
-				if self.cell >= 1 and self.cell <= 9:
-					if str( self.places[ self.cell - 1 ] ) not in "XO":
-						self.places[ self.cell - 1 ] = token
-						waiting = False
-					else:
-						print("Эта клеточка уже занята.")
+                if turn == 9:
+                    print("Ничья!")
+                    break
 
-				else:
-					print("Число должно быть от 1 до 9.")
+            self.board_generation()
 
-		def check_win(self):
-			self.win_combo = ((0, 1, 2), (3, 4, 5), (6, 7, 8), 
-							  (0, 3, 6), (1, 4, 7), (2, 5, 8),
-							  (0, 4, 8), (2, 4, 6))	
+            contin = input("Хотите продолжить yes/no? ")
 
-			for each in self.win_combo:
-				if self.places[each[0]] == self.places[each[1]] == self.places[each[2]]:
-					return self.places[each[0]]		
+            if contin == "yes":
+                TicTacToe.vsPlayer().game()
 
-			return False
 
-		def game(self):
-			turn = 0
-			win = False
-
-			while not win:
-
-				self.board_generation()
-
-				if self.rnd_token == 1:
-					if turn % 2 == 0:
-						self.first_player_turn()
-
-						if self.cell == 101:
-							break
-
-					else:
-						self.second_player_turn()
-
-						if self.cell == 101:
-							break
-
-				else:
-					if turn % 2 == 0:
-						self.second_player_turn()
-
-						if self.cell == 101:
-							break
-
-					else:
-						self.first_player_turn()
-
-						if self.cell == 101:
-							break
-
-				turn += 1
-
-				if turn > 4:
-					winner = self.check_win()
-					if winner != False:
-						print("Выйграл", winner, "!")
-						win = True
-						break
-
-				if turn == 9:
-					print("Ничья!")
-					break
-
-			self.board_generation()
-
-			contin = input("Хотите продолжить yes/no? ")
-
-			if contin == "yes":
-				TicTacToe.vsPlayer().game()
-
-if __name__ == '__main__':
-	TicTacToe().mode_selection()
+if __name__ == "__main__":
+    TicTacToe().mode_selection()
